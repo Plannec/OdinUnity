@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class Player : MonoBehaviour
 {
     private Vector3 touchPosition;
 
@@ -12,10 +12,13 @@ public class PlayerMovement : MonoBehaviour
     private AudioSource audioSource;
     private ParticleSystem dieParticles;
     private HardLight2D light;
+    private SpriteRenderer fade;
 
     private Vector3 direction;
     private float moveSpeed = 10f;
     private bool allowInput = true;
+
+    private bool dead = false;
 
     // Start is called before the first frame update
     void Start()
@@ -26,12 +29,13 @@ public class PlayerMovement : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         dieParticles = GetComponentInChildren<ParticleSystem>();
         light = GetComponentInChildren<HardLight2D>();
+        fade = GameObject.Find("Camera/Fade").GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.touchCount > 0 && allowInput)
+        if (Input.touchCount > 0 && allowInput)
         {
             Touch touch = Input.GetTouch(0);
             touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
@@ -39,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
             direction = (touchPosition - transform.position);
             rb.velocity = new Vector2(direction.x, direction.y) * moveSpeed;
 
-            if(touch.phase == TouchPhase.Ended)
+            if (touch.phase == TouchPhase.Ended)
             {
                 rb.velocity = Vector2.zero;
             }
@@ -49,20 +53,26 @@ public class PlayerMovement : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // We don't want to trigger when touching a wall.
-        if(collision.gameObject.tag == "Wall")
+        if (collision.gameObject.tag == "Wall")
         {
             return;
         }
 
         // Apply a little force indicating death.
-        rb.velocity = new Vector2(0, 3);
+        rb.velocity = new Vector2(1, 3);
 
-        audioSource.Play();
-        rb.gravityScale = 1;
-        allowInput = false;
-        bc.isTrigger = false;
-        sprite.material.SetVector("_EmissionColor", Color.red);
-        light.Color = Color.Lerp(light.Color, Color.red, 2.0f);
-        dieParticles.Play();
+        if (!dead)
+        {
+            audioSource.Play();
+            rb.gravityScale = 1;
+            bc.enabled = false;
+            allowInput = false;
+            sprite.material.SetVector("_EmissionColor", Color.red);
+            light.Color = Color.Lerp(light.Color, Color.red, 2.0f);
+            fade.color = Color.Lerp(fade.color, Color.black, 60.0f);
+            dieParticles.Play();
+        }
+
+        dead = true;
     }
 }
