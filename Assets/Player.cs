@@ -27,7 +27,7 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         bc = GetComponent<BoxCollider2D>();
         audioSource = GetComponent<AudioSource>();
-        dieParticles = GetComponentInChildren<ParticleSystem>();
+        dieParticles = GameObject.Find("Player/DieEffect").GetComponent<ParticleSystem>();
         light = GetComponentInChildren<HardLight2D>();
         fade = GameObject.Find("Camera/Fade").GetComponent<SpriteRenderer>();
     }
@@ -70,7 +70,7 @@ public class Player : MonoBehaviour
             sprite.material.SetVector("_EmissionColor", Color.red);
             light.Color = Color.Lerp(light.Color, Color.red, 2.0f);
             fade.color = Color.Lerp(fade.color, Color.black, 60.0f);
-            dieParticles.Play();
+            //dieParticles.Play();
         }
 
         dead = true;
