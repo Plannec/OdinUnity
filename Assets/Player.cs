@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
     private Vector3 touchPosition;
+
+    public string levelName;
 
     private SpriteRenderer sprite;
     private Rigidbody2D rb;
@@ -37,6 +40,7 @@ public class Player : MonoBehaviour
     {
         if (Input.touchCount > 0 && allowInput)
         {
+           
             Touch touch = Input.GetTouch(0);
             touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
             touchPosition.z = 0;
@@ -66,6 +70,7 @@ public class Player : MonoBehaviour
             audioSource.Play();
             rb.gravityScale = 1;
             bc.enabled = false;
+            SceneManager.LoadScene("Menu", LoadSceneMode.Single);
             allowInput = false;
             sprite.material.SetVector("_EmissionColor", Color.red);
             light.Color = Color.Lerp(light.Color, Color.red, 2.0f);
